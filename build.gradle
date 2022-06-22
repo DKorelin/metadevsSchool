@@ -1,5 +1,6 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id "me.champeau.jmh" version "0.6.1"
 }
 
 group 'org.example'
@@ -12,12 +13,38 @@ repositories {
 dependencies {
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.4.2'
-
-}
-dependencies {
-    implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
+//    implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
+//    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
 }
 test {
     useJUnitPlatform()
+}
+
+jmh {
+    iterations = 10 // Number of measurement iterations to do.
+    benchmarkMode = ['avgt'] // Benchmark mode. Available modes are: [Throughput/thrpt, AverageTime/avgt, SampleTime/sample, SingleShotTime/ss, All/all]
+    batchSize = 1 // Batch size: number of benchmark method calls per operation. (some benchmark modes can ignore this setting)
+    fork = 1 // How many times to forks a single benchmark. Use 0 to disable forking altogether
+    failOnError = false // Should JMH fail immediately if any benchmark had experienced the unrecoverable error?
+    forceGC = false // Should JMH force GC between iterations?
+    humanOutputFile = project.file("${project.buildDir}/results/jmh/human.txt") // human-readable output file
+    resultsFile = project.file("${project.buildDir}/results/jmh/results.txt") // results file
+    operationsPerInvocation = 10 // Operations per invocation.
+    threads = 1 // Number of worker threads to run with.
+    timeOnIteration = '1s' // Time to spend at each measurement iteration.
+    resultFormat = 'CSV' // Result format type (one of CSV, JSON, NONE, SCSV, TEXT)
+    synchronizeIterations = false // Synchronize iterations?
+    timeUnit = 'us' // Output time unit. Available time units are: [m, s, ms, us, ns].
+    verbosity = 'NORMAL' // Verbosity mode. Available modes are: [SILENT, NORMAL, EXTRA]
+    warmup = '1s' // Time to spend at each warmup iteration.
+    warmupBatchSize = 10 // Warmup batch size: number of benchmark method calls per operation.
+    warmupForks = 0 // How many warmup forks to make for a single benchmark. 0 to disable warmup forks.
+    warmupIterations = 1 // Number of warmup iterations to do.
+    warmupMode = 'INDI' // Warmup mode for warming up selected benchmarks. Warmup modes are: [INDI, BULK, BULK_INDI].
+    warmupBenchmarks = ['.*Warmup'] // Warmup benchmarks to include in the run in addition to already selected. JMH will not measure these benchmarks, but only use them for the warmup.
+
+    zip64 = true // Use ZIP64 format for bigger archives
+    jmhVersion = '1.29' // Specifies JMH version
+    includeTests = true // Allows to include test sources into generate JMH jar, i.e. use it when benchmarks depend on the test classes.
+    //duplicateClassesStrategy = DuplicatesStrategy.FAIL // Strategy to apply when encountring duplicate classes during creation of the fat jar (i.e. while executing jmhJar task)
 }
